@@ -1,0 +1,885 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>PRM Battle Dashboard – Vietnam</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --bg: #050712;
+      --bg-card: #0d1020;
+      --accent: #00f6ff;
+      --accent-soft: rgba(0, 246, 255, 0.2);
+      --accent2: #ff5af1;
+      --text-main: #f5f7ff;
+      --text-sub: #9ca3c7;
+      --danger: #ff4b6a;
+      --success: #4ade80;
+      --border-soft: #1e2238;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #1f2937 0, #020617 40%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.8fr) minmax(0, 1.2fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 960px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #111827 0, #020617 55%);
+      border-radius: 20px;
+      padding: 18px 20px 20px;
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -80%;
+      background: radial-gradient(circle at top right, rgba(0, 246, 255, 0.07), transparent 50%);
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill {
+      font-size: 11px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--accent-soft);
+      color: var(--accent);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-top: -2px;
+    }
+
+    header {
+      margin-bottom: 18px;
+    }
+
+    header h1 {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    header h1 span {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-sub);
+      text-transform: none;
+      letter-spacing: 0.03em;
+    }
+
+    header .badge {
+      font-size: 10px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #0ea5e9, #8b5cf6, #f97316);
+      text-transform: uppercase;
+    }
+
+    /* PLAYER STRIP */
+
+    .players-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 720px) {
+      .players-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .player-card {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.75));
+      border-radius: 18px;
+      padding: 12px 12px 14px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .player-card::after {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at top, rgba(248, 250, 252, 0.07), transparent 55%);
+      opacity: 0.7;
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    .player-avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      border: 2px solid var(--accent-soft);
+      overflow: hidden;
+      background: radial-gradient(circle at top, #0f172a, #020617);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .player-avatar span {
+      font-size: 11px;
+      color: var(--text-sub);
+      text-align: center;
+      padding: 4px;
+      line-height: 1.2;
+    }
+
+    .player-main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .player-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .player-name {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .player-name small {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--text-sub);
+      letter-spacing: 0.03em;
+    }
+
+    .player-meta {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    .player-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 6px rgba(34, 211, 238, 0.7);
+    }
+
+    .player-progress {
+      margin-top: 8px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+    }
+
+    .progress-bar {
+      height: 6px;
+      border-radius: 999px;
+      background: #020617;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      position: absolute;
+      inset: 0;
+      width: 30%;
+      height: 100%;
+      background: linear-gradient(90deg, #22d3ee, #a855f7, #f97316);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
+      transition: width 0.7s ease-out;
+    }
+
+    .progress-label {
+      font-size: 11px;
+      color: var(--text-sub);
+      text-align: right;
+    }
+
+    /* KPI GAUGES */
+
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 720px) {
+      .kpi-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .kpi-chip {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      padding: 6px 8px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    .kpi-label {
+      color: var(--text-sub);
+    }
+
+    .kpi-value {
+      font-weight: 600;
+    }
+
+    .kpi-state {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .kpi-state--ok {
+      border-color: rgba(74, 222, 128, 0.7);
+      color: var(--success);
+    }
+
+    .kpi-state--warn {
+      border-color: rgba(234, 179, 8, 0.7);
+      color: #fde68a;
+    }
+
+    .kpi-state--bad {
+      border-color: rgba(248, 113, 113, 0.7);
+      color: #fecaca;
+    }
+
+    /* TABLES */
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    thead {
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    th,
+    td {
+      padding: 6px 6px;
+      text-align: left;
+      border-bottom: 1px solid rgba(30, 41, 59, 0.8);
+      white-space: nowrap;
+    }
+
+    th {
+      font-weight: 500;
+      color: #e5e7eb;
+      font-size: 11px;
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    tbody tr:hover {
+      background: rgba(55, 65, 81, 0.6);
+    }
+
+    .tag {
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+    }
+
+    .tag-backlog {
+      border-color: rgba(248, 250, 252, 0.35);
+      color: #e5e7eb;
+    }
+
+    .tag-progress {
+      border-color: rgba(59, 130, 246, 0.8);
+      color: #bfdbfe;
+    }
+
+    .tag-done {
+      border-color: rgba(22, 163, 74, 0.8);
+      color: #bbf7d0;
+    }
+
+    .points-pill {
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: rgba(34, 197, 235, 0.16);
+      border: 1px solid rgba(34, 211, 238, 0.7);
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      margin-right: 4px;
+    }
+
+    .status-dot.backlog { background: #e5e7eb; }
+    .status-dot.progress { background: #3b82f6; }
+    .status-dot.done { background: #22c55e; }
+
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .legend {
+      display: flex;
+      gap: 10px;
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .legend .bar {
+      height: 6px;
+      width: 28px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #22d3ee, #a855f7, #f97316);
+    }
+
+    .muted {
+      color: var(--text-sub);
+      font-size: 11px;
+    }
+
+    .footer-note {
+      margin-top: 12px;
+      font-size: 10px;
+      color: var(--text-sub);
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>
+    PRM Battle Dashboard
+    <span>Vietnam · JustMarkets Partner Relation Team</span>
+    <span class="badge">Live Gamified KPI</span>
+  </h1>
+</header>
+
+<div class="players-row" id="playersRow">
+  <!-- Player cards will be injected here -->
+</div>
+
+<div class="grid">
+  <!-- LEFT: IB tables -->
+  <section class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">
+          New IB Performance
+          <span class="pill">Live from Sheet</span>
+        </div>
+        <div class="subtitle">
+          Names · IDs · Active clients · Trading volume in USD per PRM
+        </div>
+      </div>
+    </div>
+
+    <div id="ibTables">
+      <!-- Tables for Tri Vu and Khiem will be injected here -->
+    </div>
+  </section>
+
+  <!-- RIGHT: KPI & Tasks -->
+  <section class="right-col">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">
+            Monthly KPI Progress
+            <span class="pill">Targets 1·2·3</span>
+          </div>
+          <div class="subtitle">
+            New Active Partners & Trading Volume vs. targets
+          </div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <span><span class="bar"></span> Progress to next Target</span>
+        <span>🎯 T1: 4 partners · T2: 6 · T3: 8</span>
+      </div>
+
+      <div id="kpiContainer" style="margin-top:10px;">
+        <!-- KPI chips will be injected here -->
+      </div>
+
+      <p class="footer-note">
+        Trading volume target = previous month × (1 + % target) + Y × partners in the tier.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">
+            Backlog & Missions
+            <span class="pill">Ticket points</span>
+          </div>
+          <div class="subtitle">
+            Tasks, status and earned points per PRM.
+          </div>
+        </div>
+      </div>
+
+      <div id="tasksContainer">
+        <!-- Tasks tables will be injected here -->
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+/**
+ * CONFIG – YOUR REAL LIVE SHEET LINKS
+ */
+const CONFIG = {
+  prmSummaryCsvUrl: "https://docs.google.com/spreadsheets/d/1beV69dn9_XvvQ8fEmOMTfE_Lpb97XmA3/gviz/tq?tqx=out:csv&sheet=PRM_Summary",
+  ibCsvUrl: "https://docs.google.com/spreadsheets/d/1beV69dn9_XvvQ8fEmOMTfE_Lpb97XmA3/gviz/tq?tqx=out:csv&sheet=IB_List",
+  tasksCsvUrl: "https://docs.google.com/spreadsheets/d/1beV69dn9_XvvQ8fEmOMTfE_Lpb97XmA3/gviz/tq?tqx=out:csv&sheet=Tasks"
+};
+
+// Static player config (avatars / Naruto roles)
+const PLAYERS = [
+  {
+    id: "Tri Vu",
+    nick: "Gaara",
+    level: 7,
+    baseScore: 0,         // will be increased by ticket points
+    avatarText: "Gaara\nplaceholder",
+  },
+  {
+    id: "Khiem",
+    nick: "Shikamaru",
+    level: 6,
+    baseScore: 0,
+    avatarText: "Shikamaru\nplaceholder",
+  }
+];
+
+/**
+ * UTIL: basic CSV fetcher (no external libraries)
+ */
+async function fetchCsv(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Failed to load " + url);
+  const text = await res.text();
+  const [headerLine, ...lines] = text.trim().split(/\r?\n/);
+  const headers = headerLine.split(",").map(h => h.trim());
+  return lines.filter(Boolean).map(line => {
+    const cells = line.split(","); // simple split – avoid commas inside values in your sheet
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = (cells[i] || "").trim(); });
+    return obj;
+  });
+}
+
+/**
+ * RENDER: Players strip (top row)
+ */
+function renderPlayers(prmSummaryRows, tasksRows) {
+  const container = document.getElementById("playersRow");
+  container.innerHTML = "";
+
+  PLAYERS.forEach(player => {
+    const summary = prmSummaryRows.find(r => r.PRM === player.id) || {};
+    const tickets = tasksRows.filter(t => t.PRM === player.id);
+    const donePoints = tickets
+      .filter(t => (t.Status || "").toLowerCase() === "done")
+      .reduce((sum, t) => sum + (parseFloat(t.Points) || 0), 0);
+
+    const score = player.baseScore + donePoints;
+
+    const newPartners = parseInt(summary.NewActivePartners || "0", 10);
+    const t1 = 4, t2 = 6, t3 = 8;
+    let partnerTier = 0;
+    if (newPartners >= t3) partnerTier = 3;
+    else if (newPartners >= t2) partnerTier = 2;
+    else if (newPartners >= t1) partnerTier = 1;
+
+    const prevVolume = parseFloat(summary.PrevVolume || "0");
+    const currentVolume = parseFloat(summary.CurrentVolume || "0");
+    const nominalY = parseFloat(summary.YNominal || "0");
+
+    const threshold1 = prevVolume * 1.05 + nominalY * t1;
+    const threshold2 = prevVolume * 1.10 + nominalY * t2;
+    const threshold3 = prevVolume * 1.15 + nominalY * t3;
+
+    let volumeTier = 0;
+    if (currentVolume >= threshold3) volumeTier = 3;
+    else if (currentVolume >= threshold2) volumeTier = 2;
+    else if (currentVolume >= threshold1) volumeTier = 1;
+
+    const partnerProgress =
+      partnerTier === 0 ? (newPartners / t1) * 100 :
+      partnerTier === 1 ? ((newPartners - t1) / (t2 - t1)) * 100 :
+      partnerTier === 2 ? ((newPartners - t2) / (t3 - t2)) * 100 : 100;
+
+    const volumeTargetForTier =
+      volumeTier === 0 ? threshold1 :
+      volumeTier === 1 ? threshold2 :
+      volumeTier === 2 ? threshold3 : currentVolume;
+
+    const volumeProgress = volumeTargetForTier
+      ? Math.min(100, (currentVolume / volumeTargetForTier) * 100)
+      : 0;
+
+    const card = document.createElement("div");
+    card.className = "player-card";
+    card.innerHTML = `
+      <div class="player-avatar">
+        <!-- Replace this with <img src="gaara.png" alt=""> if you have images -->
+        <span>${player.avatarText}</span>
+      </div>
+      <div class="player-main">
+        <div class="player-header">
+          <div class="player-name">
+            ${player.id}
+            <small>${player.nick}</small>
+          </div>
+          <div class="points-pill">${score.toFixed(0)} pts</div>
+        </div>
+        <div class="player-meta">
+          <span><span class="dot"></span>Level ${player.level}</span>
+          <span>🎯 New partners: <strong>${newPartners || 0}</strong></span>
+          <span>💰 Volume: <strong>${(currentVolume || 0).toLocaleString()}</strong> USD</span>
+        </div>
+
+        <div class="player-progress">
+          <div>
+            <div class="progress-bar">
+              <div class="progress-fill"
+                   style="width:${Math.max(6, Math.min(100, partnerProgress || 0))}%"></div>
+            </div>
+          </div>
+          <div class="progress-label">
+            Partner Tier: ${partnerTier}/3
+          </div>
+        </div>
+
+        <div class="player-progress" style="margin-top:4px;">
+          <div>
+            <div class="progress-bar">
+              <div class="progress-fill"
+                   style="width:${Math.max(6, Math.min(100, volumeProgress || 0))}%"></div>
+            </div>
+          </div>
+          <div class="progress-label">
+            Volume Tier: ${volumeTier}/3
+          </div>
+        </div>
+
+        <div class="kpi-strip">
+          <div class="kpi-chip">
+            <span class="kpi-label">Target 1</span>
+            <span class="kpi-value">${t1} partners</span>
+            <span class="kpi-state ${partnerTier >= 1 ? "kpi-state--ok" : "kpi-state--warn"}">
+              ${partnerTier >= 1 ? "Hit" : "Pending"}
+            </span>
+          </div>
+          <div class="kpi-chip">
+            <span class="kpi-label">Target 2</span>
+            <span class="kpi-value">${t2} partners</span>
+            <span class="kpi-state ${partnerTier >= 2 ? "kpi-state--ok" : "kpi-state--warn"}">
+              ${partnerTier >= 2 ? "Hit" : "Pending"}
+            </span>
+          </div>
+          <div class="kpi-chip">
+            <span class="kpi-label">Target 3</span>
+            <span class="kpi-value">${t3} partners</span>
+            <span class="kpi-state ${partnerTier >= 3 ? "kpi-state--ok" : "kpi-state--bad"}">
+              ${partnerTier >= 3 ? "Hit" : "Stretch"}
+            </span>
+          </div>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+/**
+ * RENDER: IB tables
+ */
+function renderIbTables(ibRows) {
+  const container = document.getElementById("ibTables");
+  container.innerHTML = "";
+
+  PLAYERS.forEach(player => {
+    const ibForPrm = ibRows.filter(r => r.PRM === player.id);
+
+    const block = document.createElement("div");
+    block.style.marginBottom = "14px";
+    block.innerHTML = `
+      <h3 style="font-size:13px;font-weight:600;margin:6px 0 4px;">
+        ${player.id}'s New IBs
+        <span class="muted">(${ibForPrm.length} partners)</span>
+      </h3>
+      <div style="overflow-x:auto;border-radius:10px;border:1px solid rgba(30,41,59,0.8);">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>IB Name</th>
+              <th>IB ID</th>
+              <th>Active Clients</th>
+              <th>Trading Volume, USD</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${ibForPrm.map((ib, idx) => `
+              <tr>
+                <td>${idx + 1}</td>
+                <td>${ib.IBName || ""}</td>
+                <td>${ib.IBID || ""}</td>
+                <td>${ib.ActiveClients || 0}</td>
+                <td>${(parseFloat(ib.TradingVolume || "0")).toLocaleString()}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+    container.appendChild(block);
+  });
+}
+
+/**
+ * RENDER: KPI overview (whole team)
+ */
+function renderKpiOverview(prmSummaryRows) {
+  const container = document.getElementById("kpiContainer");
+  container.innerHTML = "";
+
+  const totalPartners = prmSummaryRows.reduce(
+    (sum, r) => sum + (parseInt(r.NewActivePartners || "0", 10)), 0);
+  const prevVolume = prmSummaryRows.reduce(
+    (sum, r) => sum + (parseFloat(r.PrevVolume || "0")), 0);
+  const currentVolume = prmSummaryRows.reduce(
+    (sum, r) => sum + (parseFloat(r.CurrentVolume || "0")), 0);
+
+  const t1 = 4, t2 = 6, t3 = 8;
+  const partnerRate = totalPartners;
+
+  const yTotal = prmSummaryRows.reduce(
+    (sum, r) => sum + (parseFloat(r.YNominal || "0")), 0);
+
+  const volumeT1 = prevVolume * 1.05 + yTotal * t1;
+  const volumeT2 = prevVolume * 1.10 + yTotal * t2;
+  const volumeT3 = prevVolume * 1.15 + yTotal * t3;
+
+  const block = document.createElement("div");
+  block.innerHTML = `
+    <div class="kpi-strip" style="margin-top:4px;">
+      <div class="kpi-chip">
+        <span class="kpi-label">New Active Partners</span>
+        <span class="kpi-value">${partnerRate} / ${t3}</span>
+        <span class="kpi-state ${partnerRate >= t3 ? "kpi-state--ok" : partnerRate >= t1 ? "kpi-state--warn" : "kpi-state--bad"}">
+          ${partnerRate >= t3 ? "Target 3" : partnerRate >= t2 ? "Target 2" : partnerRate >= t1 ? "Target 1" : "Below"}
+        </span>
+      </div>
+
+      <div class="kpi-chip">
+        <span class="kpi-label">Volume vs T2</span>
+        <span class="kpi-value">
+          ${(currentVolume/1_000).toFixed(1)}k / ${(volumeT2/1_000).toFixed(1)}k
+        </span>
+        <span class="kpi-state ${currentVolume >= volumeT2 ? "kpi-state--ok" : "kpi-state--warn"}">
+          ${currentVolume >= volumeT2 ? "On track" : "Push"}
+        </span>
+      </div>
+
+      <div class="kpi-chip">
+        <span class="kpi-label">Growth vs Last Month</span>
+        <span class="kpi-value">
+          ${prevVolume ? (((currentVolume - prevVolume) / prevVolume) * 100).toFixed(1) + "%" : "—"}
+        </span>
+        <span class="kpi-state ${currentVolume >= volumeT1 ? "kpi-state--ok" : "kpi-state--bad"}">
+          ${currentVolume >= volumeT1 ? "Above T1" : "Below T1"}
+        </span>
+      </div>
+    </div>
+  `;
+  container.appendChild(block);
+}
+
+/**
+ * RENDER: Tasks / backlog tables
+ */
+function renderTasks(tasksRows) {
+  const container = document.getElementById("tasksContainer");
+  container.innerHTML = "";
+
+  PLAYERS.forEach(player => {
+    const tickets = tasksRows.filter(t => t.PRM === player.id);
+
+    const block = document.createElement("div");
+    block.style.marginBottom = "12px";
+    block.innerHTML = `
+      <h3 style="font-size:13px;font-weight:600;margin:6px 0 4px;">
+        ${player.id}'s Missions
+        <span class="muted">(${tickets.length} tickets)</span>
+      </h3>
+      <div style="overflow-x:auto;border-radius:10px;border:1px solid rgba(30,41,59,0.8);">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Task</th>
+              <th>Status</th>
+              <th>Points</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tickets.map(t => {
+              const status = (t.Status || "").toLowerCase();
+              const tagClass =
+                status === "done" ? "tag-done" :
+                status === "in progress" ? "tag-progress" : "tag-backlog";
+              const dotClass =
+                status === "done" ? "done" :
+                status === "in progress" ? "progress" : "backlog";
+              return `
+                <tr>
+                  <td>${t.TicketID || ""}</td>
+                  <td>${t.Title || ""}</td>
+                  <td>
+                    <span class="tag ${tagClass}">
+                      <span class="status-dot ${dotClass}"></span>${t.Status || "Backlog"}
+                    </span>
+                  </td>
+                  <td>${t.Points || 0}</td>
+                </tr>`;
+            }).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+    container.appendChild(block);
+  });
+}
+
+/**
+ * MAIN: load all sheets and render dashboard
+ */
+async function initDashboard() {
+  try {
+    const [prmSummary, ibRows, tasksRows] = await Promise.all([
+      fetchCsv(CONFIG.prmSummaryCsvUrl),
+      fetchCsv(CONFIG.ibCsvUrl),
+      fetchCsv(CONFIG.tasksCsvUrl)
+    ]);
+
+    renderPlayers(prmSummary, tasksRows);
+    renderIbTables(ibRows);
+    renderKpiOverview(prmSummary);
+    renderTasks(tasksRows);
+  } catch (err) {
+    console.error(err);
+    alert("Error loading data from the sheet. Check the CSV links in CONFIG and sharing settings (Anyone with link – Viewer).");
+  }
+}
+
+initDashboard();
+</script>
+</body>
+</html>
