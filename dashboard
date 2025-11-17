@@ -178,6 +178,12 @@
       position: relative;
       z-index: 1;
     }
+.player-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 
     .player-avatar span {
       font-size: 11px;
@@ -545,14 +551,14 @@ const PLAYERS = [
     nick: "Gaara",
     level: 7,
     baseScore: 0,         // will be increased by ticket points
-    avatarText: "Gaara\nplaceholder",
+    avatarSrc: "gaara.png"
   },
   {
     id: "Khiem",
     nick: "Shikamaru",
     level: 6,
     baseScore: 0,
-    avatarText: "Shikamaru\nplaceholder",
+    avatarSrc: "shikamaru.png"
   }
 ];
 
@@ -623,14 +629,13 @@ function renderPlayers(prmSummaryRows, tasksRows) {
       ? Math.min(100, (currentVolume / volumeTargetForTier) * 100)
       : 0;
 
-    const card = document.createElement("div");
-    card.className = "player-card";
-    card.innerHTML = `
-      <div class="player-avatar">
-        <!-- Replace this with <img src="gaara.png" alt=""> if you have images -->
-        <span>${player.avatarText}</span>
-      </div>
-      <div class="player-main">
+   const card = document.createElement("div");
+card.className = "player-card";
+card.innerHTML = `
+  <div class="player-avatar">
+    <img src="${player.avatarSrc}" alt="${player.nick} avatar">
+  </div>
+  <div class="player-main">
         <div class="player-header">
           <div class="player-name">
             ${player.id}
